@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, StyleSheet, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import Constants from 'expo-constants';
 import Text from "./Text";
 import { Link } from "react-router-native";
 import theme from "../theme";
+import { useApolloClient, useQuery } from '@apollo/react-hooks';
+import { CURRENT_USER } from '../utils/apolloClient';
+import AuthStorageContext from '../contexts/AuthStorageContext';
 
 const styles = StyleSheet.create({
   container: {
@@ -18,24 +21,24 @@ const styles = StyleSheet.create({
 });
 
 const AppBar = () => {
+  const { data, error, loading } = useQuery(CURRENT_USER);
+  console.log(data);
+
   return <View style={styles.container}>
     <ScrollView horizontal>
       <AppBarTab text={"Repositories"} target=""/>
-      <AppBarTab text={"Sign In"} target="signin"/>
+      {
+        !loading && 
+          data.authorizedUser === null ?
+            ( <AppBarTab text={"Sign In"} target="signin"/> )
+          : 
+            ( <SignOut /> )
+        }
     </ScrollView>
   </View>;
 };
 
 const AppBarTab = ({ text, target }) => {
-  const linkText = () => {
-    return (
-      <TouchableWithoutFeedback>
-        <Text style={styles.text} fontSize="subheading">
-          {text}
-        </Text>
-      </TouchableWithoutFeedback>
-    );
-  };
 
   return (
     <Link to={`/${target}`} component={TouchableWithoutFeedback}>
@@ -43,6 +46,25 @@ const AppBarTab = ({ text, target }) => {
         {text}
       </Text>
     </Link>
+  );
+};
+
+
+const SignOut = () => {
+  const authStorage = useContext(AuthStorageContext);
+  const apolloClient = useApolloClient();
+
+  const signOut = async () => {
+    console.log("test");
+    await authStorage.removeAccessToken();
+    apolloClient.resetStore();
+  };
+  return (
+    <TouchableWithoutFeedback onPress={signOut}>
+      <Text style={styles.text} fontSize="subheading">
+        Sign Out
+      </Text>
+    </TouchableWithoutFeedback>
   );
 };
 
