@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import Text from "../Text";
 import theme from "../../theme";
+import * as Linking from 'expo-linking';
 
 const styles = StyleSheet.create({
   tinyAvatar: {
@@ -52,7 +53,21 @@ const styles = StyleSheet.create({
   },
   itemText: {
     textAlign: "center"
-  }
+  },
+  linkButton: {
+    backgroundColor: theme.colors.blueBackground,
+    color: "white",
+    width: "95%",
+    textAlign: "center",
+    padding: 10,
+    fontSize: 15,
+    margin: 10,
+    borderRadius: 5,
+  },
+  separator: {
+    height: 10,
+    backgroundColor: theme.colors.greyBackground
+  },
 });
 
 const Reaction = ({name, count}) => {
@@ -75,7 +90,11 @@ const Reaction = ({name, count}) => {
   );
 };
 
-const RepositoryItem = ({ item }) => {
+export const RepositoryItem = ({ item, testID, view }) => {
+  const onPress = () => {
+    Linking.openURL(item.url);
+  };
+  
   return (
     <View style={styles.mainFlexContainer}>
       <View style={styles.descriptionFlexContainer}>
@@ -88,7 +107,7 @@ const RepositoryItem = ({ item }) => {
           />
         </View>
         <View style={styles.textDescriptionColumn}>
-          <Text fontWeight="bold" fontSize="subheading" style={styles.textDescriptionText}>{item.fullName}</Text>
+          <Text fontWeight="bold" fontSize="subheading" style={styles.textDescriptionText} testID={testID}>{item.fullName}</Text>
           <Text color="textSecondary" style={styles.textDescriptionText}>{item.description}</Text>
           <View style={styles.languageFlexContainer}>
             <Text style={styles.languageItem}>{item.language}</Text>
@@ -101,6 +120,11 @@ const RepositoryItem = ({ item }) => {
         <Reaction name="Reviews" count={item.reviewCount} />
         <Reaction name="Rating" count={item.ratingAverage} />
       </View>
+      { view &&
+        <TouchableWithoutFeedback onPress={onPress} testID="submitButton">
+          <Text style={styles.linkButton}>Open in GitHub</Text>
+        </TouchableWithoutFeedback>
+      }
     </View>
   );
 };

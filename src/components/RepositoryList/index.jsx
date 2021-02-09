@@ -1,9 +1,10 @@
 import React from 'react';
-import { FlatList, View, StyleSheet, ActivityIndicator } from 'react-native';
+import { FlatList, View, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import RepositoryItem from "./RepositoryItem";
-import Text from "../Text";
 import theme from "../../theme";
 import useRepositories from "../../hooks/useRepositories";
+import { Link, useHistory } from "react-router-native";
+import RNPickerSelect from 'react-native-picker-select';
 
 const styles = StyleSheet.create({
   separator: {
@@ -20,6 +21,32 @@ const styles = StyleSheet.create({
 
 const ItemSeparator = () => <View style={styles.separator} />;
 
+export const RepositoryListContainer = ({ repositories }) => {
+  const history = useHistory();
+
+  const repositoryNodes = repositories
+    ? repositories.edges.map(edge => edge.node)
+    : [];
+
+  const onPress = (id) => {
+    history.push(`/repo/${id}`);
+  };
+
+  const renderItem = ({ item }) => (
+    <TouchableOpacity onPress={() => {onPress(item.id)}}>
+      <RepositoryItem item={item} testID={item.id} />
+    </TouchableOpacity>
+  );
+
+  return (
+    <FlatList
+      data={repositoryNodes}
+      ItemSeparatorComponent={ItemSeparator}
+      renderItem={renderItem}
+    />
+  );
+};
+
 const RepositoryList = () => {
   const { data, loading } = useRepositories();
 
@@ -30,21 +57,10 @@ const RepositoryList = () => {
   }
 
   const repositories = data.repositories;
-  const repositoryNodes = repositories
-    ? repositories.edges.map(edge => edge.node)
-    : [];
 
-  const renderItem = ({ item }) => (
-    <RepositoryItem item={item} />
-  );
-
-  return (
-    <FlatList
-      data={repositoryNodes}
-      ItemSeparatorComponent={ItemSeparator}
-      renderItem={renderItem}
-    />
-  );
+  return <>
+    <RepositoryListContainer repositories={repositories} />
+  </>;
 };
 
 export default RepositoryList;

@@ -53,6 +53,12 @@ const SignIn = () => {
   };
 
   return (
+    <SignInContainer onSubmit={onSubmit}/>
+  );
+};
+
+export const SignInContainer = ({ onSubmit }) => {
+  return (
     <Formik 
       initialValues={{ username: "", password: "" }} 
       onSubmit={onSubmit}
@@ -65,9 +71,9 @@ const SignIn = () => {
 const SignInForm = ({ onSubmit }) => {
   return (
     <View style={styles.signInFlexBox}>
-      <FormikTextInput name="username" placeholder="Username" />
-      <FormikTextInput name="password" placeholder="Password" secureTextEntry />
-      <TouchableWithoutFeedback onPress={onSubmit}>
+      <FormikTextInput name="username" placeholder="Username" testID="usernameField" />
+      <FormikTextInput name="password" placeholder="Password" testID="passwordField" secureTextEntry />
+      <TouchableWithoutFeedback onPress={onSubmit} testID="submitButton">
         <Text style={styles.signInButton}>Sign in</Text>
       </TouchableWithoutFeedback>
     </View>

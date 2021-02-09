@@ -30,9 +30,16 @@ const AppBar = () => {
       {
         !loading && 
           data.authorizedUser === null ?
-            ( <AppBarTab text={"Sign In"} target="signin"/> )
+            ( 
+              <>
+                <AppBarTab text={"Sign In"} target="signin"/>
+                <AppBarTab text={"Sign Up"} target="signup"/>
+              </> )
           : 
-            ( <SignOut /> )
+            ( <>
+                <AppBarTab text="Create a review" target="review"/>
+                <SignOut />
+              </> )
         }
     </ScrollView>
   </View>;
