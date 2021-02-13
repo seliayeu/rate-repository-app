@@ -3,8 +3,8 @@ import { gql } from 'apollo-boost';
 import Constants from "expo-constants";
 
 export const GET_REPOSITORIES = gql`
-  query {
-    repositories {
+  query($orderDirection: OrderDirection, $orderBy: AllRepositoriesOrderBy, $search: String, $first: Int, $after: String) {
+    repositories(orderDirection: $orderDirection, orderBy: $orderBy, searchKeyword: $search, first: $first, after: $after) {
       edges {
         node {
           id
@@ -25,6 +25,13 @@ export const GET_REPOSITORIES = gql`
           language
           authorizedUserHasReviewed
         }
+        cursor
+      }
+      pageInfo {
+        endCursor
+        startCursor
+        totalCount
+        hasNextPage
       }
     }
   }
@@ -58,7 +65,7 @@ export const SIGN_UP = gql`
 `;
 
 export const GET_REPOSITORY = gql`
-  query GetRepo($id: ID!) {
+  query GetRepo($id: ID!, $first: Int, $after: String) {
     repository(id: $id) {
       id
       name
@@ -77,7 +84,7 @@ export const GET_REPOSITORY = gql`
       description
       language
       authorizedUserHasReviewed
-      reviews {
+      reviews(first: $first, after: $after) {
         edges {
           node {
             id
@@ -89,16 +96,47 @@ export const GET_REPOSITORY = gql`
               username
             }
           }
+          cursor
+        }
+        pageInfo {
+          endCursor
+          startCursor
+          totalCount
+          hasNextPage
         }
       }  
     }
   }
 `;
+
+export const DELETE_REVIEW = gql`
+  mutation DeleteReview($id: ID!) {
+    deleteReview(id: $id)
+  }
+`;
+
 export const CURRENT_USER = gql`
-  query {
+  query($includeReviews: Boolean = false) {
       authorizedUser {
         id
         username
+        reviews @include(if: $includeReviews) {
+          edges {
+            node {
+              id
+              text
+              rating
+              createdAt
+              user {
+                id
+                username
+              }
+              repository {
+                id
+              }
+            }
+          }
+        }
     }
   }
 `;

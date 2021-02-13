@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
 });
 
 
-const RepositoryInfo = ({ repository }) => {
+export const RepositoryInfo = ({ repository }) => {
   return (
     <View>
       <RepositoryItem item={repository} testID="repView" view />
@@ -51,9 +51,9 @@ const RepositoryInfo = ({ repository }) => {
   );
 };
 
-const ItemSeparator = () => <View style={styles.separator} />;
+export const ItemSeparator = () => <View style={styles.separator} />;
 
-const ReviewItem = ({ review }) => {
+export const ReviewItem = ({ review }) => {
   return (
     <View style={styles.reviewFlexBox}>
       <Text style={styles.rating}>{review.rating}</Text>
@@ -70,19 +70,21 @@ const ReviewItem = ({ review }) => {
 
 const RepositoryView = () => {
   const { id } = useParams();
-  const { data, loading } = useRepository(id);
+  const { data, loading, fetchMore } = useRepository({ id, first: 4 });
 
   
-  if (loading) {
+  if (loading || !data) {
     return (<View style={styles.loadingView}>
       <ActivityIndicator size="large" color={theme.colors.primary} />
     </View>);
   }
 
-  console.log(data.repository.reviews.edges);
   const repository = data.repository;
   const reviews = repository.reviews.edges.map((edge) => edge.node);
 
+  const onEndReach = async () => {
+    fetchMore();
+  };
 
   return (
     <FlatList
@@ -96,6 +98,8 @@ const RepositoryView = () => {
         </View>
       }
       ItemSeparatorComponent={ItemSeparator}
+      onEndReached={onEndReach}
+      onEndReachedThreshold={0.5}
     />
   );
 };

@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { View, StyleSheet, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import Constants from 'expo-constants';
 import Text from "./Text";
-import { Link } from "react-router-native";
+import { Link, useHistory } from "react-router-native";
 import theme from "../theme";
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
 import { CURRENT_USER } from '../utils/apolloClient';
@@ -38,6 +38,7 @@ const AppBar = () => {
           : 
             ( <>
                 <AppBarTab text="Create a review" target="review"/>
+                <AppBarTab text="My reviews" target="userreviews"/>
                 <SignOut />
               </> )
         }
@@ -60,11 +61,13 @@ const AppBarTab = ({ text, target }) => {
 const SignOut = () => {
   const authStorage = useContext(AuthStorageContext);
   const apolloClient = useApolloClient();
+  const history = useHistory();
 
   const signOut = async () => {
     console.log("test");
     await authStorage.removeAccessToken();
     apolloClient.resetStore();
+    history.push("/signin");
   };
   return (
     <TouchableWithoutFeedback onPress={signOut}>
